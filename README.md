@@ -12,7 +12,12 @@ Basically, this is what it does:
 * It verifies the GPG signature of the SlackBuild tarball.
 
 The script does not install or build the actual Slackware package, it simply
-downloads the necessary files so that you can build and install it yourself.
+downloads the necessary files so that you can build and install it yourself
+using the usual way.
+
+This is just a small utility script that works for my very basic needs.
+For a much more advanced tool, you probably want something like `sbopkg`
+(https://www.sbopkg.org/) instead.
 
 # How to use
 
