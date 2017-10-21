@@ -11,13 +11,14 @@ Basically, this is what it does:
 * It makes sure the MD5 sum given in the SlackBuild matches the source tarball.
 * It verifies the GPG signature of the SlackBuild tarball.
 
-The script does not install or build the actual Slackware package, it simply
+The script does *not* install or build the actual Slackware package, it simply
 downloads the necessary files so that you can build and install it yourself
-using the usual way.
+using the usual way. After downloading the necessary files, you are free to
+build and install the package any way you wish.
 
-This is just a small utility script that works for my very basic needs.
-For a much more advanced tool, you probably want something like `sbopkg`
-(https://www.sbopkg.org/) instead.
+This is just a small utility script that works for my own (very basic) needs.
+For a much better and more advanced tool, you probably want something like
+`sbopkg` (https://sbopkg.org) instead.
 
 # How to use
 
@@ -25,9 +26,9 @@ First, import the SlackBuilds.org public key to your GPG keyring:
 
     curl -sSL https://slackbuilds.org/GPG-KEY | gpg --import -
 
-Optionally, you might want to add that key as a trusted keys.
+Optionally, you might want to add that key as a trusted key.
 
-Then you can fetch a SlackBuild, like this:
+Then, you can fetch a SlackBuild, like this:
 
     ./fetch-slackbuild.sh PACKAGE
 
