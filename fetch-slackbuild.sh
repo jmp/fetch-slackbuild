@@ -72,21 +72,6 @@ if ! [ $? = 0 ]; then
   exit 1
 fi
 
-# Download the GPG signature
-echo "Downloading GPG signature from '$SLACKBUILD_URL.asc'..."
-wget -N $SLACKBUILD_URL.asc
-if ! [ $? = 0 ]; then
-  echo "Failed to download GPG signature; aborting."
-  exit 1
-fi
-
-# Verify the signature
-gpg --verify $SLACKBUILD_TARBALL.asc
-if ! [ $? = 0 ]; then
-  echo "Failed to verify GPG signature; aborting."
-  exit 1
-fi
-
 # Extract the SlackBuild
 echo -e "Extracting SlackBuild tarball '$SLACKBUILD_TARBALL'...\n"
 tar xvf $SLACKBUILD_TARBALL -C $SLACKBUILDS_DIR

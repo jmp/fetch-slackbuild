@@ -2,7 +2,7 @@
 
 `fetch-slackbuild.sh` is a small utility script for Slackware. It fetches a
 SlackBuild and the source tarball associated with it. It also automates some
-boring stuff like verifying MD5 sums and GPG signatures.
+boring stuff like verifying the MD5 sum of the tarball.
 
 Basically, this is what it does:
 
@@ -22,13 +22,7 @@ For a much better and more advanced tool, you probably want something like
 
 # How to use
 
-First, import the SlackBuilds.org public key to your GPG keyring:
-
-    curl -sSL https://slackbuilds.org/GPG-KEY | gpg --import -
-
-Optionally, you might want to add that key as a trusted key.
-
-Then, you can fetch a SlackBuild, like this:
+You can fetch a SlackBuild like this:
 
     ./fetch-slackbuild.sh PACKAGE
 
