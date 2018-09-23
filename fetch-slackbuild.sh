@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # Get OS release information
 . /etc/*-release
