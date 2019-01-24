@@ -9,12 +9,12 @@ Basically, this is what it does:
 * It downloads the given SlackBuild from https://slackbuilds.org/.
 * It downloads the source tarball from the original source.
 * It makes sure the MD5 sum given in the SlackBuild matches the source tarball.
-* It verifies the GPG signature of the SlackBuild tarball.
+* It shows a list of dependencies that must be installed for the package.
 
 The script does *not* install or build the actual Slackware package, it simply
 downloads the necessary files so that you can build and install it yourself
-using the usual way. After downloading the necessary files, you are free to
-build and install the package any way you wish.
+using the usual Slackware tools. After downloading the necessary files, you are
+free to build and install the package any way you wish.
 
 This is just a small utility script that works for my own (very basic) needs.
 For a much better and more advanced tool, you probably want something like
