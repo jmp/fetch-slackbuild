@@ -29,35 +29,33 @@ mkdir -p $DOWNLOADS_DIR
 
 # Download SLACKBUILDS.TXT
 SLACKBUILDS_TXT_URL=$SLACKBUILDS_URL/SLACKBUILDS.TXT.gz
-SLACKBUILDS_TXT=$DOWNLOADS_DIR/$(basename $SLACKBUILDS_TXT_URL)
+SLACKBUILDS_TXT=$DOWNLOADS_DIR/$(basename "$SLACKBUILDS_TXT_URL")
 echo "Updating SlackBuild list from $SLACKBUILDS_TXT_URL..."
 
-if ! wget -qNP $DOWNLOADS_DIR $SLACKBUILDS_TXT_URL; then
+if ! wget -qNP $DOWNLOADS_DIR "$SLACKBUILDS_TXT_URL"; then
   echo "Failed to download list of SlackBuilds; aborting."
   exit 1
 fi
 
-echo "Finding package '$PACKAGE'..."
-
 # Get package metadata
-METADATA=$(zgrep -e "^SLACKBUILD NAME: $PACKAGE$" -A 9 -m 1 $SLACKBUILDS_TXT)
+METADATA=$(zgrep -e "^SLACKBUILD NAME: $PACKAGE$" -A 9 -m 1 "$SLACKBUILDS_TXT")
 
 # Make sure the package exists
-if ! [ $? = 0 ]; then
+if [ -z "$METADATA" ]; then
   echo "Package '$PACKAGE' not found; aborting."
   exit 1
 fi
 
 # Reads the given field from the metadata
 read_metadata_field() {
-  echo $(echo "$METADATA" | sed -n -e "s/^SLACKBUILD $*: \(.\+\)$/\1/p")
+  echo "$(echo "$METADATA" | sed -n -e "s/^SLACKBUILD $*: \(.\+\)$/\1/p")"
 }
 
 SLACKBUILD_NAME=$(read_metadata_field NAME)
 SLACKBUILD_DOWNLOAD_x86_64=$(read_metadata_field DOWNLOAD_x86_64)
 
 # Get the correct download link and MD5 sum based on architecture
-if [ $(uname -m) = "x86_64" ] && ! [ -z $SLACKBUILD_DOWNLOAD_x86_64 ]; then
+if [ "$(uname -m)" = "x86_64" ] && [ -n "$SLACKBUILD_DOWNLOAD_x86_64" ]; then
   SLACKBUILD_DOWNLOAD=$SLACKBUILD_DOWNLOAD_x86_64
   SLACKBUILD_MD5SUM=$(read_metadata_field MD5SUM_x86_64)
 else
@@ -66,32 +64,31 @@ else
 fi
 
 # Make sure there is a download URL
-if [ $SLACKBUILD_DOWNLOAD = "UNSUPPORTED" ]; then
+if [ "$SLACKBUILD_DOWNLOAD" = "UNSUPPORTED" ]; then
   echo "This package is not supported on your architecture."
   exit 1
 fi
 
 # Download the SlackBuild
-SLACKBUILD_URL="$SLACKBUILDS_URL/$(read_metadata_field LOCATION).tar.gz"
-SLACKBUILD_TARBALL="$DOWNLOADS_DIR/$(basename $SLACKBUILD_URL)"
+SLACKBUILD_URL=$SLACKBUILDS_URL/$(read_metadata_field LOCATION).tar.gz
+SLACKBUILD_TARBALL=$DOWNLOADS_DIR/$(basename "$SLACKBUILD_URL")
 echo "Downloading SlackBuild from $SLACKBUILD_URL..."
-if ! wget -qNP $DOWNLOADS_DIR $SLACKBUILD_URL; then
+if ! wget -qNP "$DOWNLOADS_DIR" "$SLACKBUILD_URL"; then
   echo "Failed to download SlackBuild; aborting."
   exit 1
 fi
 
 # Extract the SlackBuild
 echo "Extracting SlackBuild tarball $SLACKBUILD_TARBALL..."
-if ! tar -xf $SLACKBUILD_TARBALL -C $DOWNLOADS_DIR; then
+if ! tar -xf "$SLACKBUILD_TARBALL" -C $DOWNLOADS_DIR; then
   echo "Failed to extract SlackBuild tarball; aborting."
   exit 1
 fi
 
 # Download the upstream source tarball
-SOURCE_TARBALL="$DOWNLOADS_DIR/$SLACKBUILD_NAME/$(basename $SLACKBUILD_DOWNLOAD)"
-#pushd $(dirname $SOURCE_TARBALL) > /dev/null
+SOURCE_TARBALL=$DOWNLOADS_DIR/$SLACKBUILD_NAME/$(basename "$SLACKBUILD_DOWNLOAD")
 echo "Downloading source archive from $SLACKBUILD_DOWNLOAD..."
-if ! wget -qNP $(dirname $SOURCE_TARBALL) $SLACKBUILD_DOWNLOAD; then
+if ! wget -qNP "$(dirname "$SOURCE_TARBALL")" "$SLACKBUILD_DOWNLOAD"; then
   echo "Failed to download source archive; aborting."
   exit 1
 fi
@@ -110,13 +107,18 @@ echo "  cd $DOWNLOADS_DIR/$SLACKBUILD_NAME && ./$SLACKBUILD_NAME.SlackBuild"
 echo
 
 # Search for dependencies and make a list of missing ones, for convenience
+PACKAGES_DIR=/var/log/packages
 SLACKBUILD_REQUIRES=$(read_metadata_field REQUIRES)
 MISSING_DEPS=
-for dep in $SLACKBUILD_REQUIRES; do
-  if [ "$(ls /var/log/packages | grep -e '^$dep-')" = "" ]; then
-    MISSING_DEPS="$MISSING_DEPS $dep"
-  fi
-done
-if ! [ -z "$MISSING_DEPS" ]; then
-  echo "These dependencies have to be installed: $MISSING_DEPS"
+if [ -n "$SLACKBUILD_REQUIRES" ]; then
+  INSTALLED_PACKAGES=$(ls $PACKAGES_DIR)
+  for dep in $SLACKBUILD_REQUIRES; do
+    if [ "$(echo "$INSTALLED_PACKAGES" | grep -e "^$dep-")" = "" ]; then
+      MISSING_DEPS="$MISSING_DEPS $dep"
+    fi
+  done
+fi
+
+if [ -n "$MISSING_DEPS" ]; then
+  echo "These dependencies have to be installed:$MISSING_DEPS"
 fi
