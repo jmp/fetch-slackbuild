@@ -7,7 +7,6 @@ SLACKBUILDS_URL=https://slackbuilds.org/slackbuilds/$VERSION_ID
 SLACKBUILDS_DIR=/tmp/slackbuilds
 SLACKBUILDS_TXT_URL=$SLACKBUILDS_URL/SLACKBUILDS.TXT.gz
 SLACKBUILDS_TXT=$SLACKBUILDS_DIR/$(basename $SLACKBUILDS_TXT_URL)
-INSTALLED_PACKAGES=/var/log/packages
 PACKAGE=$*
 
 # Make sure we're running on Slackware
@@ -15,17 +14,6 @@ if ! [ "$NAME" = "Slackware" ]; then
   echo "Not running on Slackware; aborting."
   exit 1
 fi
-
-# Make sure we're running on a supported architecture
-MARCH=$(uname -m)
-case "$MARCH" in
-  i?86)   ;;
-  x86_64) ;;
-  *)      echo "Not running on a supported architecture."
-          echo "Only x86 and x86_64 are supported; you are running on $MARCH."
-          exit 1
-          ;;
-esac
 
 # Show help if no arguments are given
 if [ $# -eq 0 ]; then
@@ -38,8 +26,8 @@ mkdir -p $SLACKBUILDS_DIR
 pushd $SLACKBUILDS_DIR > /dev/null
 
 # Download SLACKBUILDS.TXT
-echo -e "Downloading list of SlackBuilds from '$SLACKBUILDS_TXT_URL'...\n"
-wget -N $SLACKBUILDS_TXT_URL
+echo -e "Updating SlackBuild list from $SLACKBUILDS_TXT_URL..."
+wget -qN $SLACKBUILDS_TXT_URL
 
 if ! [ $? = 0 ]; then
   echo "Failed to download list of SlackBuilds; aborting."
@@ -77,16 +65,16 @@ fi
 # Download the SlackBuild
 SLACKBUILD_URL="$SLACKBUILDS_URL/$(read_metadata_field LOCATION).tar.gz"
 SLACKBUILD_TARBALL="$SLACKBUILDS_DIR/$(basename $SLACKBUILD_URL)"
-echo -e "Downloading SlackBuild from '$SLACKBUILD_URL'...\n"
-wget -N $SLACKBUILD_URL
+echo -e "Downloading SlackBuild from $SLACKBUILD_URL..."
+wget -qN $SLACKBUILD_URL
 if ! [ $? = 0 ]; then
   echo "Failed to download SlackBuild; aborting."
   exit 1
 fi
 
 # Extract the SlackBuild
-echo -e "Extracting SlackBuild tarball '$SLACKBUILD_TARBALL'...\n"
-tar xvf $SLACKBUILD_TARBALL -C $SLACKBUILDS_DIR
+echo -e "Extracting SlackBuild tarball $SLACKBUILD_TARBALL..."
+tar -xf $SLACKBUILD_TARBALL -C $SLACKBUILDS_DIR
 if ! [ $? = 0 ]; then
   echo "Failed to extract SlackBuild tarball; aborting."
   exit 1
@@ -95,9 +83,8 @@ fi
 # Download the upstream source tarball
 SOURCE_TARBALL="$SLACKBUILDS_DIR/$SLACKBUILD_NAME/$(basename $SLACKBUILD_DOWNLOAD)"
 pushd $(dirname $SOURCE_TARBALL) > /dev/null
-echo
-echo -e "Downloading source archive from '$SLACKBUILD_DOWNLOAD'...\n"
-wget -N $SLACKBUILD_DOWNLOAD
+echo -e "Downloading source archive from $SLACKBUILD_DOWNLOAD..."
+wget -qN $SLACKBUILD_DOWNLOAD
 if ! [ $? = 0 ]; then
   echo "Failed to download source archive; aborting."
   exit 1
@@ -106,15 +93,13 @@ popd > /dev/null
 
 # Check the MD5 sum of the downloaded source against the one in the SlackBuild
 echo "Checking MD5 sum against the one provided with SlackBuild..."
-echo
-md5sum -c <<< "$SLACKBUILD_MD5SUM $SOURCE_TARBALL"
+md5sum --quiet -c <<< "$SLACKBUILD_MD5SUM $SOURCE_TARBALL"
 if ! [ $? = 0 ]; then
   echo "MD5 sums do not match; aborting."
   exit 1
 fi
 
 # Print a short summary
-echo
 echo "All done! To create your Slackware package, execute:"
 echo
 echo "  cd $SLACKBUILDS_DIR/$SLACKBUILD_NAME && ./$SLACKBUILD_NAME.SlackBuild"
@@ -123,7 +108,7 @@ echo
 # Search for dependencies and make a list of missing ones, for convenience
 MISSING_DEPS=
 for dep in $SLACKBUILD_REQUIRES; do
-  if [ "$(ls $INSTALLED_PACKAGES | grep -e '^$dep-')" = "" ]; then
+  if [ "$(ls /var/log/packages | grep -e '^$dep-')" = "" ]; then
     MISSING_DEPS="$MISSING_DEPS$dep "
   fi
 done
