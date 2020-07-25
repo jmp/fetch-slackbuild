@@ -62,6 +62,12 @@ else
   SLACKBUILD_MD5SUM=$(read_metadata_field MD5SUM)
 fi
 
+# Make sure there is a download URL
+if [ $SLACKBUILD_DOWNLOAD = "UNSUPPORTED" ]; then
+  echo "This package is not supported on your architecture."
+  exit 1
+fi
+
 # Download the SlackBuild
 SLACKBUILD_URL="$SLACKBUILDS_URL/$(read_metadata_field LOCATION).tar.gz"
 SLACKBUILD_TARBALL="$SLACKBUILDS_DIR/$(basename $SLACKBUILD_URL)"
