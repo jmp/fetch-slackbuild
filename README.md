@@ -22,19 +22,26 @@ For a much better and more advanced tool, you probably want something like
 
 # How to use
 
-You can fetch a SlackBuild like this:
+Run the script with a package name as an argument. For example, to fetch `ack`:
 
-    ./fetch-slackbuild.sh PACKAGE
+    ./fetch-slackbuild.sh ack
 
-This will download the SlackBuild tarball and the source tarball.
-By default, all the files are downloaded to `/tmp/slackbuilds/`.
+This will download the SlackBuild tarball from https://slackbuilds.org/, and the
+source archive from the URL defined in the SlackBuild's metadata. The output should
+look something like this:
 
-If everything goes well, you should see instructions like this:
-
+    $ ./fetch-slackbuild.sh ack
+    Updating SlackBuild list from https://slackbuilds.org/slackbuilds/14.2/SLACKBUILDS.TXT.gz...
+    Downloading SlackBuild from https://slackbuilds.org/slackbuilds/14.2/./system/ack.tar.gz...
+    Extracting SlackBuild tarball /tmp/slackbuilds/ack.tar.gz...
+    Downloading source archive from https://beyondgrep.com/ack-v3.3.1...
+    Checking MD5 sum against the one provided with SlackBuild...
     All done! To create your Slackware package, execute:
     
-      cd /tmp/slackbuilds/PACKAGE && ./PACKAGE.SlackBuild
-    
+      cd /tmp/slackbuilds/ack && ./ack.SlackBuild
 
 Running this command will build the Slackware package that you can then work
-with the basic Slackware tools like `installpkg` or `upgradepkg`.
+with the basic Slackware tools like `installpkg` or `upgradepkg`. For example,
+to install the generated `ack` Slackware package (as `root`):
+
+    # installpkg /tmp/ack-3.3.1-noarch-1_SBo.tgz
