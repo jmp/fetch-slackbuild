@@ -25,7 +25,7 @@ if [ $# -eq 0 ]; then
 fi
 
 # Make sure the downloads directory exists
-mkdir -p $DOWNLOADS_DIR
+install -g users -m 0770 -d $DOWNLOADS_DIR
 
 # Download SLACKBUILDS.TXT
 SLACKBUILDS_TXT_URL=$SLACKBUILDS_URL/SLACKBUILDS.TXT.gz
@@ -101,7 +101,7 @@ if ! echo "$SLACKBUILD_MD5SUM $SOURCE_TARBALL" | md5sum --quiet -c; then
 fi
 
 # Print a short summary
-echo "All done! To create your Slackware package, execute:"
+echo "All done! To create your Slackware package, execute (as root):"
 echo
 echo "  cd $DOWNLOADS_DIR/$SLACKBUILD_NAME && ./$SLACKBUILD_NAME.SlackBuild"
 echo
