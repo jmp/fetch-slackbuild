@@ -70,7 +70,7 @@ if [ "$SLACKBUILD_DOWNLOAD" = "UNSUPPORTED" ]; then
 fi
 
 # Download the SlackBuild
-SLACKBUILD_URL=$SLACKBUILDS_URL/$(read_metadata_field LOCATION).tar.gz
+SLACKBUILD_URL=$SLACKBUILDS_URL/$(echo $(read_metadata_field LOCATION) | cut -c 3-).tar.gz
 SLACKBUILD_TARBALL=$DOWNLOADS_DIR/$(basename "$SLACKBUILD_URL")
 echo "Downloading SlackBuild from $SLACKBUILD_URL..."
 if ! wget -qNP "$DOWNLOADS_DIR" "$SLACKBUILD_URL"; then
