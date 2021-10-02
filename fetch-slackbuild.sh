@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Get OS release information
-. /etc/*-release
+. /etc/os-release
 
 # This is the directory where all the downloaded files will be downloaded
 DOWNLOADS_DIR=/tmp/slackbuilds
