@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Get OS release information
+# shellcheck disable=SC1091
 . /etc/os-release
 
 # This is the directory where all the downloaded files will be downloaded
